@@ -16,7 +16,7 @@ class Poligon {
 
         const Point<T>& operator[](size_t index) const;
         template <typename U>
-        friend std::ostream& operator<<(std::ostream& os, const Poligono<U>& p);
+        friend std::ostream& operator<<(std::ostream& os, const Poligon<U>& p);
     private:
         std::vector<Point<T>> vertexes;
         T shoelace() const;

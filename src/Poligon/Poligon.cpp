@@ -13,7 +13,7 @@ size_t Poligon<T>::numVertexes() const {
 
 template <typename T>
 T Poligon<T>::shoelace() const {
-    if (vertexes.size() < 3) return false;
+    if (vertexes.size() < 3) return T(0);
     
     T sum = T(0);
     for (size_t i = 0; i < vertexes.size(); ++i) {
@@ -76,6 +76,6 @@ std::ostream& operator<<(std::ostream& os, const Poligon<U>& p) {
 template class Poligon<int>;
 template class Poligon<float>;
 template class Poligon<double>;
-template std::ostream& operator<<<int>(std::ostream& os, const Poligon<int>& p);
-template std::ostream& operator<<<float>(std::ostream& os, const Poligon<float>& p);
-template std::ostream& operator<<<double>(std::ostream& os, const Poligon<double>& p);
+template std::ostream& operator<<(std::ostream& os, const Poligon<int>& p);
+template std::ostream& operator<<(std::ostream& os, const Poligon<float>& p);
+template std::ostream& operator<<(std::ostream& os, const Poligon<double>& p);

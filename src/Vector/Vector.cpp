@@ -2,7 +2,10 @@
 #include <cmath>
 
 template <typename T>
-Vector<T>::Vector(const T x, const T y) : end(x, y) {}
+Vector<T>::Vector(const T x, const T y, const T z) : end(x, y, z) {}
+
+template <typename T>
+Vector<T>::Vector(const T x, const T y) : Vector(x, y, 0) {}
 
 template <typename T>
 Vector<T>::Vector(const Point<T> end) : end(end) {}
@@ -17,8 +20,8 @@ Vector<T> Vector<T>::cross(const Vector<T>& other) const {
 }
 
 template <typename T>
-T Vector<T>::cross2D(const Vector<T>& other) const {
-    return end.getX() * other.end.getY() - end.getY() * other.end.getX();
+T Vector<T>::getZ() const {
+    return end.getZ();
 }
 
 template <typename T>
