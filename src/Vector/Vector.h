@@ -10,17 +10,17 @@ class Vector {
         Vector(const Point<T> end);
         Vector(const Vector<T> &v);
 
-        T cross(const Vector<T>& other) const;
+        Vector<T> cross(const Vector<T>& other) const;
         T dot(const Vector<T>& other) const;
         T length() const;
 
-        T operator+(const Vector<T>& other) const;
-        T operator*(const T scalar) const;
+        Vector<T> operator+(const Vector<T>& other) const;
+        Vector<T> operator*(const T scalar) const;
         bool operator==(const Vector<T>& other) const;
         template <typename U>
         friend std::ostream& operator<<(std::ostream& os, const Vector<U>& vector);
 
     private:
         Point<T> end;
-}
+};
 #endif
