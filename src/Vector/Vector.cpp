@@ -40,6 +40,11 @@ Vector<T> Vector<T>::operator+(const Vector<T>& other) const {
 }
 
 template <typename T>
+Vector<T> Vector<T>::operator-(const Vector<T>& other) const {
+    return Vector<T>(end.getX() - other.end.getX(), end.getY() - other.end.getY());
+}
+
+template <typename T>
 Vector<T> Vector<T>::operator*(const T scalar) const {
     return Vector<T>(end.getX() * scalar, end.getY() * scalar);
 }

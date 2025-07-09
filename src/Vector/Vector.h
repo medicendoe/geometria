@@ -17,6 +17,7 @@ class Vector {
         T getZ() const;
 
         Vector<T> operator+(const Vector<T>& other) const;
+        Vector<T> operator-(const Vector<T>& other) const;
         Vector<T> operator*(const T scalar) const;
         bool operator==(const Vector<T>& other) const;
         template <typename U>
