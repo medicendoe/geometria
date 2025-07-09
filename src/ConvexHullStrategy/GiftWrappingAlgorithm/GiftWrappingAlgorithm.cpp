@@ -29,7 +29,7 @@ Poligon<T> GiftWrappingAlgorithm<T>::apply(const std::vector<Point<T>>& cloud) {
         
         // Find the most counterclockwise point
         for (size_t i = 0; i < cloud.size(); i++) {
-            if (orientation(cloud[current], cloud[i], cloud[next]) == 2) {
+            if (orientation(cloud[current], cloud[i], cloud[next]) == Orientation::COUNTERCLOCKWISE) {
                 next = i;
             }
         }
@@ -41,13 +41,13 @@ Poligon<T> GiftWrappingAlgorithm<T>::apply(const std::vector<Point<T>>& cloud) {
 }
 
 template<typename T>
-T GiftWrappingAlgorithm<T>::orientation(const Point<T>& current, const Point<T>& aspirant, const Point<T>& challenger) const {
+Orientation GiftWrappingAlgorithm<T>::orientation(const Point<T>& current, const Point<T>& aspirant, const Point<T>& challenger) const {
     Vector<T> v1 = aspirant - current;
     Vector<T> v2 = challenger - current; 
     Vector<T> cross = v1.cross(v2);
     
-    if (isZero(cross.getZ())) return 0;  // collinear
-    return (cross.getZ() > 0) ? 1 : 2; // clockwise or counterclockwise
+    if (isZero(cross.getZ())) return Orientation::COLLINEAR;
+    return (cross.getZ() > 0) ? Orientation::CLOCKWISE : Orientation::COUNTERCLOCKWISE;
 }
 
 // Helper method for flexible zero comparison

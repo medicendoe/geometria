@@ -5,6 +5,7 @@
 #include <vector>
 #include "Poligon/Poligon.h"
 #include "Point/Point.h"
+#include "ConvexHullStrategy/Orientation.h"
 
 template<typename T>
 class GiftWrappingAlgorithm : public AConvexHullStrategy<T> {
@@ -12,7 +13,7 @@ public:
     Poligon<T> apply(const std::vector<Point<T>>& cloud) override;
 
 private:
-    T orientation(const Point<T>& current, const Point<T>& aspirant, const Point<T>& challenger) const;
+    Orientation orientation(const Point<T>& current, const Point<T>& aspirant, const Point<T>& challenger) const;
     bool isZero(T value) const;
 };
 
