@@ -35,7 +35,7 @@ Poligon<T> GiftWrappingAlgorithm<T>::apply(const std::vector<Point<T>> cloud) {
         }
         
         current = next;
-    } while (current != leftmost);
+    } while (current != startId);
     
     return Poligon<T>(hull);
 }
