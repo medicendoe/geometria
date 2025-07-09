@@ -5,8 +5,8 @@
 
 template<typename T>
 Poligon<T> GiftWrappingAlgorithm<T>::apply(const std::vector<Point<T>>& cloud) {
-    if (cloud.size() < 3) {
-        return Poligon<T>();
+    if (cloud.size() <= 3) {
+        return Poligon<T>(cloud);
     }
     
     std::vector<Point<T>> hull;
