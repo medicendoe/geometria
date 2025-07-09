@@ -9,7 +9,7 @@
 template<typename T>
 class GiftWrappingAlgorithm : public AConvexHullStrategy<T> {
 public:
-    Poligon<T> apply(const std::vector<Point<T>> cloud) override;
+    Poligon<T> apply(const std::vector<Point<T>>& cloud) override;
 
 private:
     T orientation(const Point<T>& current, const Point<T>& aspirant, const Point<T>& challenger) const;

@@ -7,7 +7,7 @@
 template<typename T>
 class AConvexHullStrategy {
 public:
-    virtual Poligon<T> apply(const std::vector<Point<T>> cloud) = 0;
+    virtual Poligon<T> apply(const std::vector<Point<T>>& cloud) = 0;
 };
 
 #endif // ACONVEXHULLSTRATEGY_H
