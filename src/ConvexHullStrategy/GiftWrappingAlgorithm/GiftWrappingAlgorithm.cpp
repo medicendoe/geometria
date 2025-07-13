@@ -1,3 +1,4 @@
+#include "GiftWrappingAlgorithm.h"
 #include "Vector/Vector.h"
 #include <limits>
 #include <cmath>
@@ -13,9 +14,9 @@ Poligon<T> GiftWrappingAlgorithm<T>::apply(const std::vector<Point<T>>& cloud) {
     
     size_t startId = 0;
     for (size_t i = 1; i < cloud.size(); i++) {
-        if (cloud[i].y < cloud[startId].y) {
+        if (cloud[i].getY() < cloud[startId].getY()) {
             startId = i;
-        } else if (cloud[i].y == cloud[startId].y && cloud[i].x < cloud[startId].x) {
+        } else if (cloud[i].getY() == cloud[startId].getY() && cloud[i].getX() < cloud[startId].getX()) {
             startId = i;
         }
     }
@@ -25,29 +26,29 @@ Poligon<T> GiftWrappingAlgorithm<T>::apply(const std::vector<Point<T>>& cloud) {
     do {
         hull.push_back(cloud[currentId]);
         
-        size_t nextId = (current + 1) % cloud.size();
+        size_t nextId = (currentId + 1) % cloud.size();
         
         // Find the most counterclockwise point
         for (size_t i = 0; i < cloud.size(); i++) {
-            if (orientation(cloud[current], cloud[i], cloud[next]) == Orientation::COUNTERCLOCKWISE) {
-                next = i;
+            if (orientation(cloud[currentId], cloud[i], cloud[nextId]) == Orientation::COUNTERCLOCKWISE) {
+                nextId = i;
             }
         }
         
-        current = next;
-    } while (current != startId);
+        currentId = nextId;
+    } while (currentId != startId);
     
     return Poligon<T>(hull);
 }
 
 template<typename T>
 Orientation GiftWrappingAlgorithm<T>::orientation(const Point<T>& current, const Point<T>& aspirant, const Point<T>& challenger) const {
-    Vector<T> v1 = aspirant - current;
-    Vector<T> v2 = challenger - current; 
+    Vector<T> v1(aspirant.getX() - current.getX(), aspirant.getY() - current.getY());
+    Vector<T> v2(challenger.getX() - current.getX(), challenger.getY() - current.getY());
     Vector<T> cross = v1.cross(v2);
     
     if (isZero(cross.getZ())) return Orientation::COLLINEAR;
-    return (cross.getZ() > 0) ? Orientation::CLOCKWISE : Orientation::COUNTERCLOCKWISE;
+    return (cross.getZ() < 0) ? Orientation::CLOCKWISE : Orientation::COUNTERCLOCKWISE;
 }
 
 // Helper method for flexible zero comparison

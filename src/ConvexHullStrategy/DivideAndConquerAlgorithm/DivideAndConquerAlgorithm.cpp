@@ -12,7 +12,7 @@ Poligon<T> ADivideAndConquerAlgorithm<T>::apply(const std::vector<Point<T>>& clo
     
     std::vector<Point<T>> sortedPoints = cloud;
     std::sort(sortedPoints.begin(), sortedPoints.end(), [](const Point<T>& a, const Point<T>& b) {
-        return a.getX() < b.getX() || (a.getX() == b.getX() && a.getY() < b.getY());
+        return a.getX() < b.getX() || (a.getX() == b.getX() && a.getY() > b.getY());
     });
     
     std::vector<Point<T>> hullPoints = solve(sortedPoints);
@@ -47,15 +47,51 @@ std::vector<Point<T>> ADivideAndConquerAlgorithm<T>::merge(const std::vector<Poi
     bool done = false;
     while (!done) {
         done = true;
-        while (orientation(rightHull[upperRight], leftHull[upperLeft], 
-                        leftHull[(upperLeft - 1) % leftHull.size()]) != Orientation::COUNTERCLOCKWISE) {
-            upperLeft = (upperLeft + 1) % leftHull.size();
-            done = false;
+
+        bool foundLeft = false;
+        while (!foundLeft) {
+            switch (orientation(rightHull[upperRight], leftHull[upperLeft], 
+                                leftHull[(upperLeft + 1) % leftHull.size()])) {
+                case Orientation::COUNTERCLOCKWISE:
+                    foundLeft = true;
+                    break;
+                case Orientation::COLLINEAR:
+                    if (leftHull[upperLeft].dist(rightHull[upperRight]) < 
+                        leftHull[(upperLeft + 1) % leftHull.size()].dist(rightHull[upperRight])) {
+                        done = false;
+                        upperLeft = (upperLeft + 1) % leftHull.size();
+                    } else {
+                        foundLeft = true;
+                    }
+                    break;
+                case Orientation::CLOCKWISE:
+                    upperLeft = (upperLeft + 1) % leftHull.size();
+                    done = false;
+                    break;
+            }
         }
-        while (orientation(leftHull[upperLeft], rightHull[upperRight], 
-                        rightHull[(upperRight + 1) % rightHull.size()]) != Orientation::CLOCKWISE) {
-            upperRight = (upperRight - 1 + rightHull.size()) % rightHull.size();
-            done = false;
+
+        bool foundRight = false;
+        while (!foundRight) {
+            switch (orientation(leftHull[upperLeft], rightHull[upperRight], 
+                                rightHull[(upperRight - 1 + rightHull.size()) % rightHull.size()])) {
+                case Orientation::COUNTERCLOCKWISE:
+                    upperRight = (upperRight - 1 + rightHull.size()) % rightHull.size();
+                    done = false;
+                    break;
+                case Orientation::COLLINEAR:
+                    if (rightHull[upperRight].dist(leftHull[upperLeft]) < 
+                        rightHull[(upperRight - 1 + rightHull.size()) % rightHull.size()].dist(leftHull[upperLeft])) {
+                        done = false;
+                        upperRight = (upperRight - 1 + rightHull.size()) % rightHull.size();
+                    } else {
+                        foundRight = true;
+                    }
+                    break;
+                case Orientation::CLOCKWISE:
+                    foundRight = true;
+                    break;
+            }
         }
     }
     
@@ -63,17 +99,54 @@ std::vector<Point<T>> ADivideAndConquerAlgorithm<T>::merge(const std::vector<Poi
     done = false;
     while (!done) {
         done = true;
-        while (orientation(leftHull[lowerLeft], rightHull[lowerRight], 
-                        rightHull[(lowerRight + 1) % rightHull.size()]) != Orientation::COUNTERCLOCKWISE) {
-            lowerRight = (lowerRight + 1) % rightHull.size();
-            done = false;
+
+        bool foundRight = false;
+        while (!foundRight) {
+            switch (orientation(leftHull[lowerLeft], rightHull[lowerRight], 
+                                rightHull[(lowerRight + 1) % rightHull.size()])) {
+                case Orientation::COUNTERCLOCKWISE:
+                    foundRight = true;
+                    break;
+                case Orientation::COLLINEAR:
+                    if (rightHull[lowerRight].dist(leftHull[lowerLeft]) < 
+                        rightHull[(lowerRight + 1) % rightHull.size()].dist(leftHull[lowerLeft])) {
+                        done = false;
+                        lowerRight = (lowerRight + 1) % rightHull.size();
+                    } else {
+                        foundRight = true;
+                    }
+                    break;
+                case Orientation::CLOCKWISE:
+                    lowerRight = (lowerRight + 1) % rightHull.size();
+                    done = false;
+                    break;
+            }
         }
-        while (orientation(rightHull[lowerRight], leftHull[lowerLeft], 
-                        leftHull[(lowerLeft - 1 + leftHull.size()) % leftHull.size()]) != Orientation::CLOCKWISE) {
-            lowerLeft = (lowerLeft - 1 + leftHull.size()) % leftHull.size();
-            done = false;
+
+        bool foundLeft = false;
+        while (!foundLeft) {
+            switch (orientation(rightHull[lowerRight], leftHull[lowerLeft], 
+                                leftHull[(lowerLeft - 1 + leftHull.size()) % leftHull.size()])) {
+                case Orientation::COUNTERCLOCKWISE:
+                    lowerLeft = (lowerLeft - 1 + leftHull.size()) % leftHull.size();
+                    done = false;
+                    break;
+                case Orientation::COLLINEAR:
+                    if (leftHull[lowerLeft].dist(rightHull[lowerRight]) < 
+                        leftHull[(lowerLeft - 1 + leftHull.size()) % leftHull.size()].dist(rightHull[lowerRight])) {
+                        done = false;
+                        lowerLeft = (lowerLeft - 1 + leftHull.size()) % leftHull.size();
+                    } else {
+                        foundLeft = true;
+                    }
+                    break;
+                case Orientation::CLOCKWISE:
+                    foundLeft = true;
+                    break;
+            }
         }
     }
+
     
     // Merge hulls
     std::vector<Point<T>> result;
@@ -96,12 +169,12 @@ std::vector<Point<T>> ADivideAndConquerAlgorithm<T>::merge(const std::vector<Poi
 
 template<typename T>
 Orientation ADivideAndConquerAlgorithm<T>::orientation(const Point<T>& current, const Point<T>& aspirant, const Point<T>& challenger) const {
-    Vector<T> v1 = aspirant - current;
-    Vector<T> v2 = challenger - current; 
+    Vector<T> v1(aspirant.getX() - current.getX(), aspirant.getY() - current.getY());
+    Vector<T> v2(challenger.getX() - current.getX(), challenger.getY() - current.getY());
     Vector<T> cross = v1.cross(v2);
     
     if (isZero(cross.getZ())) return Orientation::COLLINEAR;
-    return (cross.getZ() > 0) ? Orientation::CLOCKWISE : Orientation::COUNTERCLOCKWISE;
+    return (cross.getZ() < 0) ? Orientation::CLOCKWISE : Orientation::COUNTERCLOCKWISE;
 }
 
 // Helper method for flexible zero comparison

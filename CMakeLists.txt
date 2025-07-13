@@ -8,6 +8,8 @@ add_library(geometria STATIC
     src/Point/Point.cpp
     src/Vector/Vector.cpp
     src/Poligon/Poligon.cpp
+    src/ConvexHullStrategy/GiftWrappingAlgorithm/GiftWrappingAlgorithm.cpp
+    src/ConvexHullStrategy/DivideAndConquerAlgorithm/DivideAndConquerAlgorithm.cpp
 )
 
 target_include_directories(geometria PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
