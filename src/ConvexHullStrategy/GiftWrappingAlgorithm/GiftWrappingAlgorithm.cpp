@@ -9,34 +9,39 @@ Poligon<T> GiftWrappingAlgorithm<T>::apply(const std::vector<Point<T>>& cloud) {
     if (cloud.size() <= 3) {
         return Poligon<T>(cloud);
     }
+
+    std::vector<Point<T>> sortedPoints = cloud;
+    std::sort(sortedPoints.begin(), sortedPoints.end(), [](const Point<T>& a, const Point<T>& b) {
+        return a.getX() < b.getX() || (a.getX() == b.getX() && a.getY() < b.getY());
+    });
     
     std::vector<Point<T>> hull;
     
-    size_t startId = 0;
-    for (size_t i = 1; i < cloud.size(); i++) {
-        if (cloud[i].getY() < cloud[startId].getY()) {
-            startId = i;
-        } else if (cloud[i].getY() == cloud[startId].getY() && cloud[i].getX() < cloud[startId].getX()) {
-            startId = i;
-        }
-    }
-
-    size_t currentId = startId;
+    size_t currentId = 0;
     
     do {
-        hull.push_back(cloud[currentId]);
+        hull.push_back(sortedPoints[currentId]);
         
-        size_t nextId = (currentId + 1) % cloud.size();
+        size_t nextId = (currentId + 1) % sortedPoints.size();
         
         // Find the most counterclockwise point
-        for (size_t i = 0; i < cloud.size(); i++) {
-            if (orientation(cloud[currentId], cloud[i], cloud[nextId]) == Orientation::COUNTERCLOCKWISE) {
-                nextId = i;
+        for (size_t i = 0; i < sortedPoints.size(); i++) {
+            switch (orientation(sortedPoints[currentId], sortedPoints[nextId], sortedPoints[i])) {
+                case Orientation::COUNTERCLOCKWISE:
+                    nextId = i;
+                    break;
+                case Orientation::COLLINEAR:
+                    if (sortedPoints[currentId].dist(sortedPoints[i]) > sortedPoints[currentId].dist(sortedPoints[nextId])) {
+                        nextId = i;
+                    }
+                    break;
+                case Orientation::CLOCKWISE:
+                    break;
             }
         }
         
         currentId = nextId;
-    } while (currentId != startId);
+    } while (currentId != 0);
     
     return Poligon<T>(hull);
 }

@@ -5,7 +5,7 @@
 #include <type_traits>
 
 template<typename T>
-Poligon<T> ADivideAndConquerAlgorithm<T>::apply(const std::vector<Point<T>>& cloud) {
+Poligon<T> DivideAndConquerAlgorithm<T>::apply(const std::vector<Point<T>>& cloud) {
     if (cloud.size() < 3) {
         return Poligon<T>(cloud);
     }
@@ -21,7 +21,7 @@ Poligon<T> ADivideAndConquerAlgorithm<T>::apply(const std::vector<Point<T>>& clo
 }
 
 template<typename T>
-std::vector<Point<T>> ADivideAndConquerAlgorithm<T>::solve(const std::vector<Point<T>>& points) const {
+std::vector<Point<T>> DivideAndConquerAlgorithm<T>::solve(const std::vector<Point<T>>& points) const {
     int n = points.size();
     
     if (n <= 3) {
@@ -39,7 +39,7 @@ std::vector<Point<T>> ADivideAndConquerAlgorithm<T>::solve(const std::vector<Poi
 }
 
 template<typename T>
-std::vector<Point<T>> ADivideAndConquerAlgorithm<T>::merge(const std::vector<Point<T>>& leftHull, std::vector<Point<T>>& rightHull) const {
+std::vector<Point<T>> DivideAndConquerAlgorithm<T>::merge(const std::vector<Point<T>>& leftHull, std::vector<Point<T>>& rightHull) const {
 
     size_t leftStartId = leftHull.size()-1, rightStartId = 0;
 
@@ -168,7 +168,7 @@ std::vector<Point<T>> ADivideAndConquerAlgorithm<T>::merge(const std::vector<Poi
 }
 
 template<typename T>
-Orientation ADivideAndConquerAlgorithm<T>::orientation(const Point<T>& current, const Point<T>& aspirant, const Point<T>& challenger) const {
+Orientation DivideAndConquerAlgorithm<T>::orientation(const Point<T>& current, const Point<T>& aspirant, const Point<T>& challenger) const {
     Vector<T> v1(aspirant.getX() - current.getX(), aspirant.getY() - current.getY());
     Vector<T> v2(challenger.getX() - current.getX(), challenger.getY() - current.getY());
     Vector<T> cross = v1.cross(v2);
@@ -179,7 +179,7 @@ Orientation ADivideAndConquerAlgorithm<T>::orientation(const Point<T>& current, 
 
 // Helper method for flexible zero comparison
 template<typename T>
-bool ADivideAndConquerAlgorithm<T>::isZero(T value) const {
+bool DivideAndConquerAlgorithm<T>::isZero(T value) const {
     if constexpr (std::is_floating_point_v<T>) {
         return std::abs(value) < std::numeric_limits<T>::epsilon() * 10;
     } else {
@@ -188,6 +188,6 @@ bool ADivideAndConquerAlgorithm<T>::isZero(T value) const {
 }
 
 // Explicit template instantiations
-template class ADivideAndConquerAlgorithm<int>;
-template class ADivideAndConquerAlgorithm<float>;
-template class ADivideAndConquerAlgorithm<double>;
+template class DivideAndConquerAlgorithm<int>;
+template class DivideAndConquerAlgorithm<float>;
+template class DivideAndConquerAlgorithm<double>;

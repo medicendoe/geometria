@@ -8,7 +8,7 @@
 #include "ConvexHullStrategy/Orientation.h"
 
 template<typename T>
-class ADivideAndConquerAlgorithm : public AConvexHullStrategy<T> {
+class DivideAndConquerAlgorithm : public AConvexHullStrategy<T> {
 public:
     Poligon<T> apply(const std::vector<Point<T>>& cloud) override;
 
