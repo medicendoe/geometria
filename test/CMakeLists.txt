@@ -1,4 +1,11 @@
-add_executable(run_tests tests.cpp)
+add_executable(run_tests 
+    PointTest.cpp
+    VectorTest.cpp
+    PolygonTest.cpp
+    ConvexHullTest.cpp
+    OrientationTest.cpp
+    PointGenerationTest.cpp
+)
 
 target_link_libraries(run_tests PRIVATE geometria gtest_main)
 
