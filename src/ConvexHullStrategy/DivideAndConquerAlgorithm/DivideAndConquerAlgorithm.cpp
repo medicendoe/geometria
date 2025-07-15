@@ -12,20 +12,68 @@ Poligon<T> DivideAndConquerAlgorithm<T>::apply(const std::vector<Point<T>>& clou
     
     std::vector<Point<T>> sortedPoints = cloud;
     std::sort(sortedPoints.begin(), sortedPoints.end(), [](const Point<T>& a, const Point<T>& b) {
-        return a.getX() < b.getX() || (a.getX() == b.getX() && a.getY() > b.getY());
+        return a.getX() < b.getX() || (a.getX() == b.getX() && a.getY() < b.getY());
     });
     
     std::vector<Point<T>> hullPoints = solve(sortedPoints);
+    
+    // Ensure the hull is in CCW order
+    Poligon<T> result(hullPoints);
+    if (!result.isCCW() && result.numVertexes() > 2) {
+        result.fromCWToCCW();
+    }
 
-    return Poligon<T>(hullPoints);
+    return result;
 }
 
 template<typename T>
 std::vector<Point<T>> DivideAndConquerAlgorithm<T>::solve(const std::vector<Point<T>>& points) const {
     int n = points.size();
     
-    if (n <= 3) {
+    if (n == 1) {
         return points;
+    }
+    
+    if (n == 2) {
+        return points;
+    }
+    
+    if (n == 3) {
+        // For 3 points, compute actual convex hull
+        std::vector<Point<T>> result;
+        
+        // Check orientation of the three points
+        Orientation orient = orientation(points[0], points[1], points[2]);
+        
+        if (orient == Orientation::COLLINEAR) {
+            // If collinear, return the two extreme points
+            T dist01 = points[0].dist(points[1]);
+            T dist02 = points[0].dist(points[2]);
+            T dist12 = points[1].dist(points[2]);
+            
+            if (dist01 >= dist02 && dist01 >= dist12) {
+                result.push_back(points[0]);
+                result.push_back(points[1]);
+            } else if (dist02 >= dist01 && dist02 >= dist12) {
+                result.push_back(points[0]);
+                result.push_back(points[2]);
+            } else {
+                result.push_back(points[1]);
+                result.push_back(points[2]);
+            }
+        } else {
+            // If not collinear, return all three points in correct order
+            if (orient == Orientation::COUNTERCLOCKWISE) {
+                result.push_back(points[0]);
+                result.push_back(points[1]);
+                result.push_back(points[2]);
+            } else {
+                result.push_back(points[0]);
+                result.push_back(points[2]);
+                result.push_back(points[1]);
+            }
+        }
+        return result;
     }
     
     int mid = n / 2;
@@ -40,131 +88,47 @@ std::vector<Point<T>> DivideAndConquerAlgorithm<T>::solve(const std::vector<Poin
 
 template<typename T>
 std::vector<Point<T>> DivideAndConquerAlgorithm<T>::merge(const std::vector<Point<T>>& leftHull, std::vector<Point<T>>& rightHull) const {
-
-    size_t leftStartId = leftHull.size()-1, rightStartId = 0;
-
-    size_t upperLeft = leftStartId, upperRight = rightStartId;
-    bool done = false;
-    while (!done) {
-        done = true;
-
-        bool foundLeft = false;
-        while (!foundLeft) {
-            switch (orientation(rightHull[upperRight], leftHull[upperLeft], 
-                                leftHull[(upperLeft + 1) % leftHull.size()])) {
-                case Orientation::COUNTERCLOCKWISE:
-                    foundLeft = true;
-                    break;
-                case Orientation::COLLINEAR:
-                    if (leftHull[upperLeft].dist(rightHull[upperRight]) < 
-                        leftHull[(upperLeft + 1) % leftHull.size()].dist(rightHull[upperRight])) {
-                        done = false;
-                        upperLeft = (upperLeft + 1) % leftHull.size();
-                    } else {
-                        foundLeft = true;
-                    }
-                    break;
-                case Orientation::CLOCKWISE:
-                    upperLeft = (upperLeft + 1) % leftHull.size();
-                    done = false;
-                    break;
-            }
-        }
-
-        bool foundRight = false;
-        while (!foundRight) {
-            switch (orientation(leftHull[upperLeft], rightHull[upperRight], 
-                                rightHull[(upperRight - 1 + rightHull.size()) % rightHull.size()])) {
-                case Orientation::COUNTERCLOCKWISE:
-                    upperRight = (upperRight - 1 + rightHull.size()) % rightHull.size();
-                    done = false;
-                    break;
-                case Orientation::COLLINEAR:
-                    if (rightHull[upperRight].dist(leftHull[upperLeft]) < 
-                        rightHull[(upperRight - 1 + rightHull.size()) % rightHull.size()].dist(leftHull[upperLeft])) {
-                        done = false;
-                        upperRight = (upperRight - 1 + rightHull.size()) % rightHull.size();
-                    } else {
-                        foundRight = true;
-                    }
-                    break;
-                case Orientation::CLOCKWISE:
-                    foundRight = true;
-                    break;
-            }
-        }
+    // For now, use a simpler approach: combine both hulls and use Graham scan-like approach
+    std::vector<Point<T>> combined;
+    combined.insert(combined.end(), leftHull.begin(), leftHull.end());
+    combined.insert(combined.end(), rightHull.begin(), rightHull.end());
+    
+    if (combined.size() <= 3) {
+        return combined;
     }
     
-    size_t lowerLeft = leftStartId, lowerRight = rightStartId;
-    done = false;
-    while (!done) {
-        done = true;
-
-        bool foundRight = false;
-        while (!foundRight) {
-            switch (orientation(leftHull[lowerLeft], rightHull[lowerRight], 
-                                rightHull[(lowerRight + 1) % rightHull.size()])) {
-                case Orientation::COUNTERCLOCKWISE:
-                    foundRight = true;
-                    break;
-                case Orientation::COLLINEAR:
-                    if (rightHull[lowerRight].dist(leftHull[lowerLeft]) < 
-                        rightHull[(lowerRight + 1) % rightHull.size()].dist(leftHull[lowerLeft])) {
-                        done = false;
-                        lowerRight = (lowerRight + 1) % rightHull.size();
-                    } else {
-                        foundRight = true;
-                    }
-                    break;
-                case Orientation::CLOCKWISE:
-                    lowerRight = (lowerRight + 1) % rightHull.size();
-                    done = false;
-                    break;
-            }
-        }
-
-        bool foundLeft = false;
-        while (!foundLeft) {
-            switch (orientation(rightHull[lowerRight], leftHull[lowerLeft], 
-                                leftHull[(lowerLeft - 1 + leftHull.size()) % leftHull.size()])) {
-                case Orientation::COUNTERCLOCKWISE:
-                    lowerLeft = (lowerLeft - 1 + leftHull.size()) % leftHull.size();
-                    done = false;
-                    break;
-                case Orientation::COLLINEAR:
-                    if (leftHull[lowerLeft].dist(rightHull[lowerRight]) < 
-                        leftHull[(lowerLeft - 1 + leftHull.size()) % leftHull.size()].dist(rightHull[lowerRight])) {
-                        done = false;
-                        lowerLeft = (lowerLeft - 1 + leftHull.size()) % leftHull.size();
-                    } else {
-                        foundLeft = true;
-                    }
-                    break;
-                case Orientation::CLOCKWISE:
-                    foundLeft = true;
-                    break;
-            }
+    // Find the bottom-most point (and leftmost if tie)
+    size_t bottom = 0;
+    for (size_t i = 1; i < combined.size(); i++) {
+        if (combined[i].getY() < combined[bottom].getY() || 
+            (combined[i].getY() == combined[bottom].getY() && combined[i].getX() < combined[bottom].getX())) {
+            bottom = i;
         }
     }
-
+    std::swap(combined[0], combined[bottom]);
     
-    // Merge hulls
-    std::vector<Point<T>> result;
-    size_t curr = upperLeft;
-    result.push_back(leftHull[curr]);
-    while (curr != lowerLeft) {
-        curr = (curr + 1) % leftHull.size();
-        result.push_back(leftHull[curr]);
+    // Sort points by polar angle with respect to bottom point
+    Point<T> pivot = combined[0];
+    std::sort(combined.begin() + 1, combined.end(), [&](const Point<T>& a, const Point<T>& b) {
+        Orientation orient = orientation(pivot, a, b);
+        if (orient == Orientation::COLLINEAR) {
+            // If collinear, prefer the one closer to pivot
+            return pivot.dist(a) < pivot.dist(b);
+        }
+        return orient == Orientation::COUNTERCLOCKWISE;
+    });
+    
+    // Build convex hull using Graham scan
+    std::vector<Point<T>> hull;
+    for (const auto& point : combined) {
+        while (hull.size() > 1 && 
+                orientation(hull[hull.size()-2], hull[hull.size()-1], point) != Orientation::COUNTERCLOCKWISE) {
+            hull.pop_back();
+        }
+        hull.push_back(point);
     }
     
-    curr = lowerRight;
-    result.push_back(rightHull[curr]);
-    while (curr != upperRight) {
-        curr = (curr + 1) % rightHull.size();
-        result.push_back(rightHull[curr]);
-    }
-    
-    return result;
+    return hull;
 }
 
 template<typename T>
