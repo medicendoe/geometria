@@ -17,7 +17,7 @@ class HullPercentageStrategy : public APointGenerationStrategy<T> {
             std::random_device rd;
             std::mt19937 gen(rd());
             std::uniform_real_distribution<> distrib_angle(0.0, 2 * PI);
-            std::uniform_real_distribution<> distrib_0_1(0.0, 1.0); // Para sqrt y variación
+            std::uniform_real_distribution<> distrib_0_1(0.0, 0.9); // Para sqrt y variación
 
             double cx = 5000.0, cy = 5000.0, R = 4500.0;
 
