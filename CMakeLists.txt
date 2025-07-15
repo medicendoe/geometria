@@ -5,11 +5,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(geometria STATIC
-    src/Point/Point.cpp
-    src/Vector/Vector.cpp
-    src/Poligon/Poligon.cpp
-    src/ConvexHullStrategy/GiftWrappingAlgorithm/GiftWrappingAlgorithm.cpp
-    src/ConvexHullStrategy/DivideAndConquerAlgorithm/DivideAndConquerAlgorithm.cpp
+  src/Point/Point.cpp
+  src/Vector/Vector.cpp
+  src/Poligon/Poligon.cpp
+  src/ConvexHullStrategy/GiftWrappingAlgorithm/GiftWrappingAlgorithm.cpp
+  src/ConvexHullStrategy/DivideAndConquerAlgorithm/DivideAndConquerAlgorithm.cpp
+  src/PointGenerationStrategy/HullPercentageStrategy/HullPercentageStrategy.cpp
+  src/PointGenerationStrategy/RandomPointStrategy/RandomPointStrategy.cpp
 )
 
 target_include_directories(geometria PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
